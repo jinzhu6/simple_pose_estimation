@@ -5,18 +5,21 @@
 
 using namespace cv;
 using namespace std;
+//using namespace cv::viz;
 
-// Checks if a matrix is a valid rotation matrix.
+// Checks if a matrix is a valid rotation matrix. To be a rotation
+// matrix, a matrix should meet the following two criteria: 1) R^{T}R
+// = I and 2) det(R)=1
 bool isRotationMatrix(Mat &R)
 {
-    Mat Rt;
-    transpose(R, Rt);
-    Mat shouldBeIdentity = Rt * R;
-    std::cout <<"The following should be an identity matrix, R^{T}R=" << std::endl
-	      << shouldBeIdentity << std::endl;
-    Mat I = Mat::eye(3,3, shouldBeIdentity.type());
-    
-    return  norm(I, shouldBeIdentity) < 1e-6;
+  Mat Rt;
+  transpose(R, Rt);
+  Mat shouldBeIdentity = Rt * R;
+  std::cout <<"The following should be an identity matrix, R^{T}R=" << std::endl
+	    << shouldBeIdentity << std::endl;
+  Mat I = Mat::eye(3,3, shouldBeIdentity.type());
+  
+  return  norm(I, shouldBeIdentity) < 1e-6;
 }
 
 // Calculates rotation matrix to euler angles
@@ -75,7 +78,6 @@ Mat eulerAnglesToRotationMatrix(Vec3f &theta)
     Mat R = R_z * R_y * R_x;
     
     return R;
-
 }
 
 int main(int argc, char** argv)
@@ -122,6 +124,13 @@ int main(int argc, char** argv)
   //fx=409 pixels; fy=408 pixels; u0=237; and v0=171. 
   double fx = 409, fy = 408, u0=237, v0=171;
   Mat camera_matrix = (Mat_ <double>(3,3) << fx, 0, u0, 0, fy, v0, 0, 0, 1);
+  cv::Matx33d cam_matrix(camera_matrix);
+  /*
+  cv::Matx33d cam_mat = cv::Max33d(camera_matrix.at<double>(0,0), camera_matrix.at<double>(0,1), camera_matrix.at<double>(0,2),
+			   camera_matrix.at<double>(1,0), camera_matrix.at<double>(1,1), camera_matrix.at<double>(1,2),
+			   camera_matrix.at<double>(2,0), camera_matrix.at<double>(2,1), camera_matrix.at<double>(2,2));
+  */
+  
   // Assuming no distortion
   Mat dist_coeffs = Mat::zeros(4,1,cv::DataType<double>::type);
   std::cout << "Camera_matrix " << endl << camera_matrix << endl;
@@ -150,11 +159,60 @@ int main(int argc, char** argv)
   std::cout << "Rotation vector " << std::endl << rvec << std::endl;
   std::cout << "Rotation matrix " << std::endl << rotation << std::endl;
   std::cout << "Translation vector " << std::endl << tvec << std::endl;
+
+  std::cout << "input_img.depth()=" << input_img.depth() << std::endl;
   
   namedWindow("Input Image");  
-  imshow("Input Image", input_img);
-
+  cv::imshow("Input Image", input_img);
   waitKey();
 
+  // Visualization of point clouds  
+  cv::viz::Viz3d visualizer("Viz Window");
+  visualizer.setBackgroundColor(cv::viz::Color::white());
+
+  // Create a virtual camera
+  cv::viz::WCameraPosition cam(cam_matrix,
+			       input_img,
+			       30.0,
+			       cv::viz::Color::black());
+
+  // Add the virtual camera to the environment
+  visualizer.showWidget("Camera", cam);
+
+  // Create a virtual bench from cuboids
+  cv::viz::WCube plane1(Point3f(0.0, 45.0, 0.0), 
+			Point3f(242.5, 21.0, -9.0), 
+			true,  // show wire frame 
+			cv::viz::Color::blue());
+  
+  plane1.setRenderingProperty(cv::viz::LINE_WIDTH, 4.0);
+
+  cv::viz::WCube plane2(Point3f(0.0, 9.0, -9.0), 
+			Point3f(242.5, 0.0, 44.5), 
+			true,  // show wire frame 
+			cv::viz::Color::blue());
+  
+  plane2.setRenderingProperty(cv::viz::LINE_WIDTH, 4.0);
+  
+  // Add the virtual objects to the environment
+  visualizer.showWidget("top", plane1);
+  visualizer.showWidget("bottom", plane2);  
+
+  //cv::Mat rotation;
+  // convert vector-3 rotation
+  // to a 3x3 rotation matrix
+  //cv::Rodrigues(rvec, rotation);
+
+  // Move the bench	
+  Affine3d pose(rotation, tvec);
+  visualizer.setWidgetPose("top", pose);
+  visualizer.setWidgetPose("bottom", pose);
+
+  // visualization loop
+  while(waitKey(100)==-1 && !visualizer.wasStopped()) {
+    visualizer.spinOnce(1,    // pause 1ms 
+			true);  // redraw
+  }
+  
   return 0;
 }
