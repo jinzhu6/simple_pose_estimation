@@ -5,7 +5,6 @@
 
 using namespace cv;
 using namespace std;
-//using namespace cv::viz;
 
 // Checks if a matrix is a valid rotation matrix. To be a rotation
 // matrix, a matrix should meet the following two criteria: 1) R^{T}R
@@ -25,59 +24,61 @@ bool isRotationMatrix(Mat &R)
 // Calculates rotation matrix to euler angles
 // The result is the same as MATLAB except the order
 // of the euler angles ( x and z are swapped ).
-// [Determine yaw, pitch and roll directly from rotation matrix](http://planning.cs.uiuc.edu/node103.html)
+//
+// [Determine yaw, pitch and roll directly from rotation
+// matrix](http://planning.cs.uiuc.edu/node103.html)
 Vec3f rotationMatrixToEulerAngles(Mat &R)
 {
-    assert(isRotationMatrix(R));
+  assert(isRotationMatrix(R));
     
-    float sy = sqrt(R.at<double>(0,0) * R.at<double>(0,0) +  R.at<double>(1,0) * R.at<double>(1,0) );
+  float sy = sqrt(R.at<double>(0,0) * R.at<double>(0,0) +  R.at<double>(1,0) * R.at<double>(1,0) );
 
-    bool singular = sy < 1e-6; // If
+  bool singular = sy < 1e-6; // If
 
-    float x, y, z;
-    if (!singular)
-    {
-        x = atan2(R.at<double>(2,1) , R.at<double>(2,2));
-        y = atan2(-R.at<double>(2,0), sy);
-        z = atan2(R.at<double>(1,0), R.at<double>(0,0));
-    }
-    else
-    {
-        x = atan2(-R.at<double>(1,2), R.at<double>(1,1));
-        y = atan2(-R.at<double>(2,0), sy);
-        z = 0;
-    }
-    return Vec3f(x, y, z);
+  float x, y, z;
+  if (!singular)
+  {
+    x = atan2(R.at<double>(2,1) , R.at<double>(2,2));
+    y = atan2(-R.at<double>(2,0), sy);
+    z = atan2(R.at<double>(1,0), R.at<double>(0,0));
+  }else
+  {
+    x = atan2(-R.at<double>(1,2), R.at<double>(1,1));
+    y = atan2(-R.at<double>(2,0), sy);
+    z = 0;
+  }
+
+  return Vec3f(x, y, z);
 }
 
 // Calculates rotation matrix given euler angles.
 Mat eulerAnglesToRotationMatrix(Vec3f &theta)
 {
-    // Calculate rotation about x axis
-    Mat R_x = (Mat_<double>(3,3) <<
-               1,       0,              0,
-               0,       cos(theta[0]),   -sin(theta[0]),
-               0,       sin(theta[0]),   cos(theta[0])
-               );
-    
-    // Calculate rotation about y axis
-    Mat R_y = (Mat_<double>(3,3) <<
-               cos(theta[1]),    0,      sin(theta[1]),
-               0,               1,      0,
-               -sin(theta[1]),   0,      cos(theta[1])
-               );
-    
-    // Calculate rotation about z axis
-    Mat R_z = (Mat_<double>(3,3) <<
-               cos(theta[2]),    -sin(theta[2]),      0,
-               sin(theta[2]),    cos(theta[2]),       0,
-               0,               0,                  1);
-    
-    
-    // Combined rotation matrix
-    Mat R = R_z * R_y * R_x;
-    
-    return R;
+  // Calculate rotation about x axis
+  Mat R_x = (Mat_<double>(3,3) <<
+	     1,       0,              0,
+	     0,       cos(theta[0]),   -sin(theta[0]),
+	     0,       sin(theta[0]),   cos(theta[0])
+	     );
+  
+  // Calculate rotation about y axis
+  Mat R_y = (Mat_<double>(3,3) <<
+	     cos(theta[1]),    0,      sin(theta[1]),
+	     0,               1,      0,
+	     -sin(theta[1]),   0,      cos(theta[1])
+	     );
+  
+  // Calculate rotation about z axis
+  Mat R_z = (Mat_<double>(3,3) <<
+	     cos(theta[2]),    -sin(theta[2]),      0,
+	     sin(theta[2]),    cos(theta[2]),       0,
+	     0,               0,                  1);
+  
+  
+  // Combined rotation matrix
+  Mat R = R_z * R_y * R_x;
+  
+  return R;
 }
 
 int main(int argc, char** argv)
@@ -85,9 +86,8 @@ int main(int argc, char** argv)
   Mat input_img;
 
   input_img = imread("../bench_img.jpg", IMREAD_COLOR);
-  //input_img = imread(argv[1], IMREAD_COLOR);
-  std::cout << "Type of input image=" << input_img.type() << std::endl;
-  std::cout << "Size of input image=" << input_img.size() << std::endl;
+  //std::cout << "Type of input image=" << input_img.type() << std::endl;
+  //std::cout << "Size of input image=" << input_img.size() << std::endl;
   
   if (!input_img.data)
   {
@@ -125,11 +125,6 @@ int main(int argc, char** argv)
   double fx = 409, fy = 408, u0=237, v0=171;
   Mat camera_matrix = (Mat_ <double>(3,3) << fx, 0, u0, 0, fy, v0, 0, 0, 1);
   cv::Matx33d cam_matrix(camera_matrix);
-  /*
-  cv::Matx33d cam_mat = cv::Max33d(camera_matrix.at<double>(0,0), camera_matrix.at<double>(0,1), camera_matrix.at<double>(0,2),
-			   camera_matrix.at<double>(1,0), camera_matrix.at<double>(1,1), camera_matrix.at<double>(1,2),
-			   camera_matrix.at<double>(2,0), camera_matrix.at<double>(2,1), camera_matrix.at<double>(2,2));
-  */
   
   // Assuming no distortion
   Mat dist_coeffs = Mat::zeros(4,1,cv::DataType<double>::type);
@@ -141,27 +136,24 @@ int main(int argc, char** argv)
 	       camera_matrix, dist_coeffs, // calibration 
 	       rvec, tvec);    // output pose
 
-  // Convert to 3D rotation matrix
+  // Convert rotation vector, rvec (1x3), to 3D rotation matrix (3x3)
   cv::Mat rotation;
   cv::Rodrigues(rvec, rotation);
 
-  // Calculate Euler angles from rotation matrix
+  // Calculate Euler angles (1x3) from rotation matrix (3x3)
   Vec3f e = rotationMatrixToEulerAngles(rotation);
   
-  // Calculate rotation matrix
+  // Calculate rotation matrix (3x3) from the calculated Euler angles for
+  // verification
   Mat R = eulerAnglesToRotationMatrix(e);
     
-  // Calculate rotation matrix
-  //Mat R1 = eulerAnglesToRotationMatrix(e1);
   cout << endl << "Euler Angles from R" << endl << e << endl;
   cout << endl << "R from the Euler Angles: " << endl << R << endl << endl;
 
   std::cout << "Rotation vector " << std::endl << rvec << std::endl;
-  std::cout << "Rotation matrix " << std::endl << rotation << std::endl;
-  std::cout << "Translation vector " << std::endl << tvec << std::endl;
+  std::cout << endl << "R, " << std::endl << rotation << std::endl;
+  std::cout << "T, " << std::endl << tvec << std::endl;
 
-  std::cout << "input_img.depth()=" << input_img.depth() << std::endl;
-  
   namedWindow("Input Image");  
   cv::imshow("Input Image", input_img);
   waitKey();
@@ -197,11 +189,6 @@ int main(int argc, char** argv)
   // Add the virtual objects to the environment
   visualizer.showWidget("top", plane1);
   visualizer.showWidget("bottom", plane2);  
-
-  //cv::Mat rotation;
-  // convert vector-3 rotation
-  // to a 3x3 rotation matrix
-  //cv::Rodrigues(rvec, rotation);
 
   // Move the bench	
   Affine3d pose(rotation, tvec);
