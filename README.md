@@ -6,19 +6,19 @@ In Computer Vision, the pose of an object typically refers to its
 relative orientation and position with respect to a camera. One can
 change the pose of an object by either moving the object with respect
 to the camera, or the camera with respect to the object. The pose of
-the object can be estimated by analyzing the correspondences between
-features.
+the object is typically estimated by analyzing the correspondences
+between features extracted from different images.
 
 <ul>
-<li> 2D-to-2D: [Nister, 2004]
-<li> 3D-to-3D:
+<li> 2D-to-2D: See [Hartley and Zisserman, 2000] for the projective transformation/homography and [Nister, 2004] as a seminal work on the visual odometry.
+<li> 3D-to-3D: See [Maimone et al., 2007] as an example of such a case.
 <li> 3D-to-2D: As pointed out [Nister, 2004], motion estimation from
 3D-to-2D correspondences is more accurate than from 3D-to-3D cases
 because it minimizes the image reprojection error instead of dealing
 with 3D-to-3D feature position error. The sample codes in this repo is
 about an example solution to the problem of PnP
 (Perspective-n-Points). Some well-known PnP solutions are P3P [Gao et
-al., 2003], EPnP [Lepetit et al., 2009]
+al., 2003], EPnP [Lepetit et al., 2009].
 </ul>
 
 ## Reference
@@ -55,6 +55,12 @@ Pascal Fua, <a
 href="http://http://icwww.epfl.ch/~lepetit/papers/lepetit_ijcv08.pdf">EPnP:
 an accurate O(n) solution to the PnP problem</a>, <i>International
 Journal of Computer Vision</i>, 2009.
+
+<li>[Maimone et al., 2007] Mark Maimone, Yang Cheng and Larry
+Matthies, <a
+href="https://www-robotics.jpl.nasa.gov/publications/Mark_Maimone/rob-06-0081.R4.pdf">Two
+years of visual odometry on the mars exploration rovers</a>,
+<i>Journal of Field Robotics</i>, 24(3): 169-186, 2007.
 
 <li>[Nister, 2004] David Nister, <a
 href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.86.8769&rep=rep1&type=pdf">An
@@ -95,6 +101,55 @@ Analysis and Machine Intelligence</i>, 21(8): 774-780, 1999.
 <p>
 OpenCV ver 3.0 or above, CMake ver 2.8 or above
 </p>
+
+To enable cv::viz, VTK in an OpenCV code, the following has to be
+done. If you already installed the VTK and OpenCV properly, and don't
+have any issues in calling any built-in functions of cv::viz package,
+you don't need to do this.
+
+<ol>
+<li> Install VTK (Visualization Toolkit)
+<ul>
+
+<li> Download <a href="https://www.vtk.org/download/">VTK
+7.7.1</a>. Note I've tried to do the following with VTK 8.1, but it
+didn't work, but VTK 7.7.1 and OpenCV 3.1.0 or 3.3.0 worked well.
+<li>Unzip VTK-7.1.1.zip
+
+<li>At the directory unzipped VTK-7.1.1, type `ccmake .` This will pop
+up cmake GUI. At the menu, do the following:
+
+```bash
+BUILD_SHARED_LIBS = ON
+BUILD_TESTING = ON
+CMAKE_BUILD_TYPE = Release
+```
+
+Then push 'c' to save the current configuration and exit.
+<li>At the directory unzipped VTK-7.1.1, do the following:
+
+```bash
+cmake .
+make
+sudo make install
+```
+
+<li> Once you're done with all the above steps, you have VTK shared
+libraries and their friends installed on your local machine. Now move
+on to the "Re-Compile OpenCV" part.
+
+</ul>
+<li>Re-Compile OpenCV
+<li>Download OpenCV 3.3.0 and unzip it
+<li>At the directory unziped OpenCV, do the following:
+```bash
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON -D BUILD_EXAMPLES=ON –D WITH_VTK=ON ..
+make
+sudo make install
+```
+</ol>
 
 ## Build
 
