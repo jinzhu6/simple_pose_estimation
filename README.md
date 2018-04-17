@@ -102,18 +102,20 @@ Analysis and Machine Intelligence</i>, 21(8): 774-780, 1999.
 OpenCV ver 3.0 or above, CMake ver 2.8 or above
 </p>
 
-To enable cv::viz, VTK in an OpenCV code, the following has to be
-done. If you already installed the VTK and OpenCV properly, and don't
-have any issues in calling any built-in functions of cv::viz package,
-you don't need to do this.
+To enable cv::viz, the VTK package in your OpenCV codes, the following
+has to be done: Install VTK and Recompile OpenCV. If you already
+installed the VTK and OpenCV properly, and don't have any issues in
+calling any built-in functions of cv::viz package, you don't need to
+do this.
 
 <ol>
-<li> Install VTK (Visualization Toolkit)
-<ul>
+<li>Install VTK (Visualization Toolkit):
+<ol>
 
-<li> Download <a href="https://www.vtk.org/download/">VTK
-7.7.1</a>. Note I've tried to do the following with VTK 8.1, but it
-didn't work, but VTK 7.7.1 and OpenCV 3.1.0 or 3.3.0 worked well.
+<li> Download <a href="https://www.vtk.org/download/">VTK 7.7.1</a>
+Note I've tried to do this with VTK 8.1, but it didn't work. So the
+following steps only work with VTK 7.7.1 and OpenCV 3.1.0 or 3.3.0.
+
 <li>Unzip VTK-7.1.1.zip
 
 <li>At the directory unzipped VTK-7.1.1, type `ccmake .` This will pop
@@ -125,7 +127,9 @@ BUILD_TESTING = ON
 CMAKE_BUILD_TYPE = Release
 ```
 
-Then push 'c' to save the current configuration and exit.
+Then push 'c' to save the current configuration and exit. You'll have
+to push 'c' at the beginning to see any of these.
+
 <li>At the directory unzipped VTK-7.1.1, do the following:
 
 ```bash
@@ -136,11 +140,12 @@ sudo make install
 
 <li> Once you're done with all the above steps, you have VTK shared
 libraries and their friends installed on your local machine. Now move
-on to the "Re-Compile OpenCV" part.
+on to the next part, "Re-Compile OpenCV." 
 
-</ul>
+</ol>
 <li>Re-Compile OpenCV
-<li>Download OpenCV 3.3.0 and unzip it
+<ol>
+<li>Download OpenCV 3.3.0 and unzip it.
 <li>At the directory unziped OpenCV, do the following:
 ```bash
 mkdir build
@@ -149,6 +154,7 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PY
 make
 sudo make install
 ```
+</ol>
 </ol>
 
 ## Build
