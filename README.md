@@ -145,13 +145,21 @@ on to the next part, "Re-Compile OpenCV."
 </ol>
 <li>Re-Compile OpenCV
 <ol>
-<li>Download OpenCV 3.3.0 and unzip it.
+
+<li>Download <a href="https://opencv.org/releases.html">OpenCV
+3.3.0</a> and unzip it.
+
 <li>At the directory unziped OpenCV, do the following:
+
 ```bash
 mkdir build
+
 cd build
+
 cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON -D BUILD_EXAMPLES=ON –D WITH_VTK=ON ..
+
 make
+
 sudo make install
 ```
 </ol>
