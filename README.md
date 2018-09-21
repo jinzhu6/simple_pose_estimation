@@ -1,13 +1,14 @@
-This is a toy example about how the pose of a camera is estimated.
+# Pose Estimation
+#### This is a toy example about how the pose of a camera is estimated.
 
-## Pipeline
+## Overview
 
-In Computer Vision, the pose of an object typically refers to its
+In Computer Vision, the **pose** of an object typically refers to its
 relative orientation and position with respect to a camera. One can
 change the pose of an object by either moving the object with respect
 to the camera, or the camera with respect to the object. The pose of
 the object is typically estimated by analyzing the correspondences
-between features extracted from different images.
+between features extracted from different images -- more than one image looking at the same scene from different angles.
 
 <ul>
 <li> 2D-to-2D: See [Hartley and Zisserman, 2000] for the projective transformation/homography and [Nister, 2004] as a seminal work on the visual odometry.
@@ -16,8 +17,7 @@ between features extracted from different images.
 3D-to-2D correspondences is more accurate than from 3D-to-3D cases
 because it minimizes the image reprojection error instead of dealing
 with 3D-to-3D feature position error. The sample codes in this repo is
-about an example solution to the problem of PnP
-(Perspective-n-Points). Some well-known PnP solutions are P3P [Gao et
+about a solution to the problem of the PnP (Perspective-n-Points). Some well-known PnP solutions are P3P [Gao et
 al., 2003], EPnP [Lepetit et al., 2009].
 </ul>
 
@@ -98,22 +98,22 @@ Analysis and Machine Intelligence</i>, 21(8): 774-780, 1999.
 </ul>
 
 ## Requirements
-<p>
-OpenCV ver 3.0 or above, CMake ver 2.8 or above
-</p>
+To make it run, you need
+* OpenCV ver 3.0 or above
+* CMake ver 2.8 or above
 
 To enable cv::viz, the VTK package in your OpenCV codes, the following
 has to be done: Install VTK and Recompile OpenCV. If you already
 installed the VTK and OpenCV properly, and don't have any issues in
 calling any built-in functions of cv::viz package, you don't need to
-do this.
+do the followings.
 
 <ol>
 <li>Install VTK (Visualization Toolkit):
 <ol>
 
 <li> Download <a href="https://www.vtk.org/download/">VTK 7.7.1</a>
-Note I've tried to do this with VTK 8.1, but it didn't work. So the
+**Note** I've tried to do this with VTK 8.1, but it didn't work. So the
 following steps only work with VTK 7.7.1 and OpenCV 3.1.0 or 3.3.0.
 
 <li>Unzip VTK-7.1.1.zip
@@ -127,8 +127,8 @@ BUILD_TESTING = ON
 CMAKE_BUILD_TYPE = Release
 ```
 
-Then push 'c' to save the current configuration and exit. You'll have
-to push 'c' at the beginning to see any of these.
+Then press `c` to save the current configuration and exit. You'll have
+to push `c` at the beginning to see any of these.
 
 <li>At the directory unzipped VTK-7.1.1, do the following:
 
@@ -140,7 +140,7 @@ sudo make install
 
 <li> Once you're done with all the above steps, you have VTK shared
 libraries and their friends installed on your local machine. Now move
-on to the next part, "Re-Compile OpenCV." 
+on to the next part, "Re-Compile OpenCV."
 
 </ol>
 <li>Re-Compile OpenCV
@@ -166,7 +166,7 @@ sudo make install
 </ol>
 
 ## Build
-
+Now you have all the required libraries. It's time to build the repo.
 To build, do the following at the directory you cloned this repo:
 
 ```bash
@@ -184,3 +184,8 @@ After compilation, in the build directly, type the following:
 cd build
 ./pe
 ```
+
+## Results
+![Input Image](input-image.png)
+
+![Output Image](output-image.png)
